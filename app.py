@@ -1,14 +1,15 @@
 from flask import Flask, request, jsonify
 import os
-import getpass
 import json
 from langchain.chat_models import init_chat_model
-from pyngrok import ngrok  # Add this import
+from pyngrok import ngrok, conf
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Set your Google API key (ask once at startup if not set)
+# Set ngrok auth token
+conf.get_default().auth_token = "2Rozyomo6nwINc5yaRzByoSL4GY_4wTUVY3cbXx1GN1qTGi8a"
+
+# Set Google API key
 if not os.environ.get("GOOGLE_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = "AIzaSyDq5fHiaxRfzgOaVO8SF4bCvqKykM1UAi4"
 
@@ -41,27 +42,22 @@ def extract_hiring_info():
         """
 
 
+        
         response = model.invoke(prompt)
         output_str = response.content.strip()
 
-        try:
-            if output_str.startswith("```"):
-                output_str = "\n".join(
-                    line for line in output_str.splitlines() if not line.strip().startswith("```")
-                )
-            output_json = json.loads(output_str)
-        except json.JSONDecodeError:
-            return jsonify({"error": "Failed to parse JSON from model output", "raw_output": output_str}), 500
+        if output_str.startswith("```"):
+            output_str = "\n".join(
+                line for line in output_str.splitlines() if not line.strip().startswith("```")
+            )
 
+        output_json = json.loads(output_str)
         return jsonify(output_json)
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    # Start ngrok tunnel
     public_url = ngrok.connect(5050)
     print(" * ngrok tunnel URL:", public_url)
-
-    # Run Flask app
     app.run(debug=True, host="0.0.0.0", port=5050)
