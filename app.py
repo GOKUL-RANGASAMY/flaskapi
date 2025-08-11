@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # Set your Google API key (ask once at startup if not set)
 if not os.environ.get("GOOGLE_API_KEY"):
-    os.environ["GOOGLE_API_KEY"] = getpass.getpass("Enter API key for Google Gemini: ")
+    os.environ["GOOGLE_API_KEY"] = "AIzaSyDq5fHiaxRfzgOaVO8SF4bCvqKykM1UAi4"
 
 # Initialize Gemini model
 model = init_chat_model("gemini-2.5-flash", model_provider="google_genai")
